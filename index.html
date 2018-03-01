@@ -21,7 +21,7 @@
             <input id="questionInput" type="text"/>
         </p>
         <p>
-            <label for="fillintext">Text do fill in:</label>
+            <label for="fillintext">Text to fill in:</label>
             <textarea id="fillintext" type="text"></textarea>
         </p>
         <p>
@@ -36,32 +36,18 @@
     <script type="application/javascript">
         function dataGetter() {
             var lastEdit = Date.now();
-            var fillintext = [];
-            var description = "";
             
-            /**
-            for (var i = 1; i <= countAnswers(); i++) {
-                var value = document.getElementById('answer' + i).value;
-                if (value !== undefined && value.length !== undefined && value.length > 0) {
-                    answers.push({
-                        value: value,
-                        order: i,
-                        lastEdit: lastEdit,
-                        id: i
-                    });
-                }
-            } **/
-
             return {
                 // return data object
                 title: document.getElementById('titleInput').value,
                 priority: 1,
                 type: 'FillIN',
                 question: document.getElementById('questionInput').value,
-                fillintext: fillintext,
+                fillintext: document.getElementById('fillintext').value,
                 questionContext: document.getElementById('hintInput').value,
                 answerContext: document.getElementById('explanationInput').value,
                 lastEdit: lastEdit,
+                answers: extractAnswersToArray(document.getElementById('fillintext').value),
                 id: 0,
                 lessonId: 0,
                 releaseStatus: 'PUBLIC',
@@ -70,13 +56,32 @@
                 skipStatus: 'NEVER_SKIPPABLE',
                 multimedia: [],
                 // preview metadata
-                description: description,
-                /**
-                description: document.getElementById('questionInput').value.replace(/<\/?[^>]+(>|$)/g, "")
-                + "\n" + answers.map(function (e, i) {
-                    return "(" + (i + 1) + ") " + e.value
-                }).join("\n") **/
+                description: replacePossibleAnswers(document.getElementById('fillintext').value),
             }
+        }
+
+        function replacePossibleAnswers (string) {
+            var re = /\[(.*?)\]/g;
+            var toReplace = string.match(re);
+
+            for (var i = 0; i<toReplace.length; i++) {
+                string = string.replace(toReplace[i], "(" + (i+1) + ")")
+            }
+            return string;
+        }
+
+        function extractAnswersToArray (string) {
+            var a = [];
+            var re = /\[(.*?)\]/g;
+            var uglyArray = string.match(re);
+            for (var i = 0; i<uglyArray.length; i++) {
+                var b = uglyArray[i].replace(/[\[\]']+/g,"").split("|");
+                for (var j = 0; j < b.length; j++) {
+                    b[j] = b[j].trim;
+                }
+                a.push(b);
+            }
+            return a;
         }
 
         init();
