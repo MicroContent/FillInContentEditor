@@ -63,10 +63,12 @@
         function replacePossibleAnswers (string) {
             var re = /\[(.*?)\]/g;
             var toReplace = string.match(re);
+            var emptyArray = []
 
             for (var i = 0; i<toReplace.length; i++) {
                 string = string.replace(toReplace[i], "(" + (i+1) + ")")
             }
+            if (extractAnswersToArray(string).length == 0 ) return emptyArray;
             return string;
         }
 
