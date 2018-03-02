@@ -17,10 +17,6 @@
             <input id="titleInput" type="text" />
         </p>
         <p>
-            <label for="questionInput">Enter question:</label>
-            <input id="questionInput" type="text"/>
-        </p>
-        <p>
             <label for="fillintext">Text to fill in:</label>
             <textarea id="fillintext" type="text"></textarea>
         </p>
@@ -42,7 +38,6 @@
                 title: document.getElementById('titleInput').value,
                 priority: 1,
                 type: 'FillIN',
-                question: document.getElementById('questionInput').value,
                 fillintext: document.getElementById('fillintext').value,
                 questionContext: document.getElementById('hintInput').value,
                 answerContext: document.getElementById('explanationInput').value,
@@ -59,36 +54,29 @@
                 description: replacePossibleAnswers(document.getElementById('fillintext').value),
             }
         }
-
         function replacePossibleAnswers (string) {
             var re = /\[(.*?)\]/g;
             var toReplace = string.match(re);
             var emptyArray = []
 
+            if (toReplace == null) return string;
+
             for (var i = 0; i<toReplace.length; i++) {
                 string = string.replace(toReplace[i], "(" + (i+1) + ")")
             }
-            if (extractAnswersToArray(string).length == 0 ) return emptyArray;
+            //if (extractAnswersToArray(string).length == 0 ) return emptyArray;
             return string;
         }
 
         function extractAnswersToArray (string) {
             var a = [];
             var re = /\[(.*?)\]/g;
-            var uglyArray = string.match(re);
-            for (var i = 0; i<uglyArray.length; i++) {
-                var b = uglyArray[i].replace(/[\[\]']+/g,"").split("|");
-                for (var j = 0; j < b.length; j++) {
-                    b[j] = b[j].trim;
-                }
-                a.push(b);
-            }
-            return a;
+            if (string.match(re)==null) return [];
+            return string.match(re).map(function(e){ return e.replace(/[\[\]']+/g,"").split('|').map(function(e1){ return e1.trim()})})
         }
 
         init();
         document.getElementById('titleInput').value = window.data.title;
-        document.getElementById('questionInput').value = window.data.question;
         document.getElementById('fillintext').value = window.data.fillintext;
         document.getElementById('hintInput').value = window.data.questionContext;
         document.getElementById('explanationInput').value = window.data.answerContext;
